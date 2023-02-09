@@ -204,15 +204,33 @@ class Grouped extends AbstractType
     {
         $html = '';
 
+
+        $minPrice = $this->getMinimalPrice();
+         $maxPrice =$this->getActualPrice();
+
         if ($this->haveDiscount()) {
-            $html .= '<div class="sticker sale">' . trans('shop::app.products.sale') . '</div>';
+            $html .= '<div class="sticker sale">' . trans('shop::app.products.sale') . '</div>';    
+        }
+        // $html .= '<span class="price-label">' . trans('shop::app.products.starting-at') . '</span>'
+        // . ' '
+        // . '<span class="final-price">' . core()->currency($this->getMinimalPrice()) . '</span>';
+
+        $discountPercentage = round((($maxPrice - $minPrice) / $maxPrice) * 100);
+
+        if ($minPrice < $maxPrice) {
+            $html = '<div class="sticker sale">' . trans('shop::app.products.sale') . '</div>'
+            . '<span class="regular-price">' . core()->currency($this->evaluatePrice($maxPrice)) . '</span>'
+            . '<span class="special-price">' . core()->currency($this->evaluatePrice($minPrice)) . '</span>'
+            . ' <span class="card-discount">' . $discountPercentage . '% off</span>';
+        } else {
+            $html = '<span>' . core()->currency($this->evaluatePrice($maxPrice)) . '</span>';
         }
 
-        $html .= '<span class="price-label">' . trans('shop::app.products.starting-at') . '</span>'
-        . ' '
-        . '<span class="final-price">' . core()->currency($this->getMinimalPrice()) . '</span>';
 
         return $html;
+
+
+
     }
 
     /**
